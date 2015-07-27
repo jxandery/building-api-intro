@@ -21,10 +21,20 @@ class ItemsController < ApplicationController
     @item = Item.new(item_params)
 
     if @item.save
-      redirect_to items_path, notice: "The item was created."
+      respond_to do |format|
+        format.html {redirect_to items_path, notice: "The item was created."}
+        format.json {render json: @item}
+        format.xml {render xml: @item}
+      end
     else
-      flash.now[:notice] = "The item was not created."
-      render :edit
+      respond_to do |format|
+        format.html do
+          flash.now[:notice] = "The item was not created."
+          render :edit
+        end
+        format.json { render json: { messages: @item.errors.messages}}
+        format.xml { render xml: { messages: @item.errors.messages}}
+      end
     end
   end
 
