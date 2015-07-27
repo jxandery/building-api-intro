@@ -1,5 +1,6 @@
 class Api::V1::ItemsController < ApplicationController
   respond_to :json, :xml
+  before_action :authenticate
 
   def index
     respond_with Item.all
@@ -21,5 +22,13 @@ class Api::V1::ItemsController < ApplicationController
 
   def item_params
     params.require(:item).permit(:name, :description)
+  end
+
+  def authenticate
+    authenticate_or_request_with_http_basic('Please authenticate to use API') do |email, password|
+      user = User.find_by(email: email)
+
+      return true if user && user.authenticate(password)
+    end
   end
 end
