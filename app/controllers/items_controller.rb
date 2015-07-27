@@ -46,10 +46,21 @@ class ItemsController < ApplicationController
     @item = Item.find(params[:id])
 
     if @item.update_attributes(item_params)
-      redirect_to item_path(@item), notice: "The item was updated."
+
+      respond_to do |format|
+        format.html {redirect_to item_path(@item), notice: "The item was updated."}
+        format.json {render json: @item}
+        format.xml {render xml: @item}
+      end
     else
-      flash.now[:notice] = "The item was not updated."
-      render :edit
+      respond_to do |format|
+        format.html do
+          flash.now[:notice] = "The item was not updated."
+          render :edit
+        end
+        format.json { render json: { messages: @item.errors.messages}}
+        format.xml { render xml: { messages: @item.errors.messages}}
+      end
     end
   end
 
